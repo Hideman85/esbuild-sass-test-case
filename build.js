@@ -1,3 +1,4 @@
+const path = require('path')
 const esbuild = require('esbuild')
 const { sassPlugin, postcssModules } = require('esbuild-sass-plugin')
 
@@ -30,10 +31,14 @@ const build = async () => {
     target: 'es2018',
     plugins: [
       sassPlugin({
-        outputStyle: isProd ? 'compressed' : 'expanded'
+        // outputStyle: isProd ? 'compressed' : 'expanded',
         // transform: postcssModules({
         //   // ...put here the options for postcss-modules: https://github.com/madyankin/postcss-modules
         // })
+        precompile(source, pathname) {
+          console.log("precompile:", pathname)
+          return source.replace(/(url\(['"])(\.\.?\/)([^'"]+['"]\))/g, `$1${path.dirname(pathname)}/$2$3`)
+        }
       })
     ]
   })
